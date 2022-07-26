@@ -194,24 +194,40 @@ func getDeviceForPath(path string) (device, error) {
 	return dev, nil
 }
 
-var blockFormatTemplate = "/sys/dev/block/%d:%d/dm"
+var checkStorageDriver = checkBlockDevice
 
-var checkStorageDriver = isDeviceMapper
+var blockFormatTemplates = map[string]string{
+	"dm":    "/sys/dev/block/%d:%d/dm",
+	"block": "/sys/dev/block/%d:%d/device/block",
+	"loop":  "/sys/dev/block/%d:%d/loop",
+}
 
-// isDeviceMapper checks if the device with the major and minor numbers is a devicemapper block device
-func isDeviceMapper(major, minor int) (bool, error) {
-
-	//Check if /sys/dev/block/${major}-${minor}/dm exists
-	sysPath := fmt.Sprintf(blockFormatTemplate, major, minor)
+func isBlockDevice(major, minor int, formatTemplate string) (bool, error) {
+	sysPath := fmt.Sprintf(formatTemplate, major, minor)
 
 	_, err := os.Stat(sysPath)
 	if err == nil {
 		return true, nil
 	} else if os.IsNotExist(err) {
 		return false, nil
+	} else {
+		return false, err
+	}
+}
+
+func checkBlockDevice(major, minor int) (bool, error) {
+	for dev, template := range blockFormatTemplates {
+		isBD, err := isBlockDevice(major, minor, template)
+		if err != nil {
+			return false, err
+		}
+		if isBD {
+			mountLogger().Infof("device is identified as a block device with type %s", dev)
+			return isBD, nil
+		}
 	}
 
-	return false, err
+	return false, nil
 }
 
 const mountPerm = os.FileMode(0755)

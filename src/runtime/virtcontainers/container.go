@@ -1232,12 +1232,12 @@ func (c *Container) hotplugDrive(ctx context.Context) error {
 		"mount-point":  dev.mountPoint,
 	}).Info("device details")
 
-	isDM, err := checkStorageDriver(dev.major, dev.minor)
+	isBD, err := checkStorageDriver(dev.major, dev.minor)
 	if err != nil {
 		return err
 	}
 
-	if !isDM {
+	if !isBD {
 		return nil
 	}
 
