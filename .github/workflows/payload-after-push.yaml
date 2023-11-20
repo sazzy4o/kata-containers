@@ -19,21 +19,21 @@ jobs:
       target-branch: ${{ github.ref_name }}
     secrets: inherit
 
-  # build-assets-arm64:
-  #   uses: ./.github/workflows/build-kata-static-tarball-arm64.yaml
-  #   with:
-  #     commit-hash: ${{ github.sha }}
-  #     push-to-registry: no
-  #     target-branch: ${{ github.ref_name }}
-  #   secrets: inherit
+  build-assets-arm64:
+    uses: ./.github/workflows/build-kata-static-tarball-arm64.yaml
+    with:
+      commit-hash: ${{ github.sha }}
+      push-to-registry: no
+      target-branch: ${{ github.ref_name }}
+    secrets: inherit
 
-  # build-assets-s390x:
-  #   uses: ./.github/workflows/build-kata-static-tarball-s390x.yaml
-  #   with:
-  #     commit-hash: ${{ github.sha }}
-  #     push-to-registry: no
-  #     target-branch: ${{ github.ref_name }}
-  #   secrets: inherit
+  build-assets-s390x:
+    uses: ./.github/workflows/build-kata-static-tarball-s390x.yaml
+    with:
+      commit-hash: ${{ github.sha }}
+      push-to-registry: no
+      target-branch: ${{ github.ref_name }}
+    secrets: inherit
 
   # publish-kata-deploy-payload-amd64:
   #   needs: build-assets-amd64
