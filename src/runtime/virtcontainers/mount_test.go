@@ -100,6 +100,30 @@ func TestGetDeviceForPath(t *testing.T) {
 	assert.Error(err)
 }
 
+func TestCheckBlockDevice(t *testing.T) {
+	assert := assert.New(t)
+
+	// known major, minor for /dev/tty
+	major := 5
+	minor := 0
+
+	isBD, err := checkBlockDevice(major, minor)
+	assert.NoError(err)
+	assert.False(isBD)
+
+	// fake the block device format
+	blockFormatTemplatesOld := blockFormatTemplates
+	defer func() {
+		blockFormatTemplates = blockFormatTemplatesOld
+	}()
+	blockFormatTemplates = map[string]string{
+		"/dev/tty": "/sys/dev/char/%d:%d",
+	}
+	isBD, err = checkBlockDevice(major, minor)
+	assert.NoError(err)
+	assert.True(isBD)
+}
+
 func TestIsDockerVolume(t *testing.T) {
 	assert := assert.New(t)
 	path := "/var/lib/docker/volumes/00da1347c7cf4f15db35f/_data"
